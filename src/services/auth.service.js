@@ -10,7 +10,6 @@ const {
   TOKEN_TYPES: { ACCESS_TOKEN, REFRESH_TOKEN },
 } = require('../constants')
 const User = require('../models/user.model')
-const userService = require('./user.service')
 const tokenService = require('./token.service')
 const { HttpError } = require('../helpers')
 const Token = require('../models/token.model')
@@ -22,22 +21,12 @@ const Token = require('../models/token.model')
  */
 
 /**
- * Compare raw password with hashed password
- * @param {string} hashedPassword
- * @param {string} rawPassword
- * @returns
- */
-const comparePassword = async (hashedPassword, rawPassword) => {
-  return await bcrypt.compare(rawPassword, hashedPassword)
-}
-
-/**
  * Login
  * @param {string} email
  * @param {string} password
  * @returns {Promise<{ user, authTokens }>}
  */
-const localLogin = async (email, password) => {
+const login = async (email, password) => {
   const user = await User.findOne({ email })
 
   if (!user) {
@@ -125,8 +114,10 @@ const refreshAuthTokens = async (accessToken, refreshToken) => {
   return tokenService.createAuthTokens(userId)
 }
 
-module.exports = {
-  localLogin,
+const authService = {
+  login,
   logout,
   refreshAuthTokens,
 }
+
+module.exports = authService
