@@ -7,4 +7,10 @@ module.exports = {
       password: Joi.string().required(),
     }),
   },
+
+  logout: {
+    body: Joi.object({
+      refreshToken: Joi.string().required(),
+    }),
+  },
 }

@@ -55,8 +55,10 @@ const logout = async (refreshToken) => {
     body: refreshToken,
     type: REFRESH_TOKEN,
   })
-  refreshTokenDoc.isRevoked = true
-  await refreshTokenDoc.save()
+  if (refreshTokenDoc) {
+    refreshTokenDoc.isRevoked = true
+    await refreshTokenDoc.save()
+  }
 }
 
 /**

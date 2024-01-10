@@ -1,3 +1,5 @@
+const { StatusCodes } = require('http-status-codes')
+
 const authService = require('../services/auth.service')
 
 /** @type {import('express').RequestHandler} */
@@ -8,4 +10,14 @@ const login = async (req, res) => {
   return res.json({ user, authTokens })
 }
 
-module.exports = { login }
+/** @type {import('express').RequestHandler} */
+const logout = async (req, res) => {
+  await authService.logout(req.body.refreshToken)
+
+  return res.status(StatusCodes.NO_CONTENT).send()
+}
+
+module.exports = {
+  login,
+  logout,
+}
