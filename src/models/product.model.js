@@ -5,11 +5,9 @@ const { toJSONPlugin } = require('./plugins')
 
 const productSchema = new mongoose.Schema(
   {
-    name: { type: String, trim: true, required: true },
+    name: { type: String, trim: true, unique: true, required: true },
 
-    slug: { type: String, trim: true, required: true },
-
-    description: { type: String, required: true },
+    description: { type: String },
 
     price: { type: Number, required: true, min: 0 },
 
@@ -25,7 +23,9 @@ const productSchema = new mongoose.Schema(
 
     images: { type: [String] },
 
-    tags: { type: [String] },
+    tags: {
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: MODEL_NAMES.TAG }],
+    },
   },
 
   { timestamps: true },

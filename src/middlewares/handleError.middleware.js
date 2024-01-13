@@ -1,16 +1,28 @@
-const ENV_CONFIG = require('../configs/env.config')
-const { HttpError } = require('../helpers')
 const { StatusCodes } = require('http-status-codes')
+
+const { HttpError } = require('../helpers')
+const { cloudinary } = require('../configs/cloudinary.config')
+const ENV_CONFIG = require('../configs/env.config')
+
+const deleteFile = (file) => {
+  if (file.storageName === 'cloudinary') {
+    cloudinary.uploader.destroy(file.filename)
+  }
+}
 
 /** @type {import('express').ErrorRequestHandler} */
 const handleError = async (err, req, res, next) => {
   const isOnProduction = ENV_CONFIG.NODE_ENV === 'prod'
 
   if (req.file) {
-    // TODO: Handle delete file
+    deleteFile(req.file)
   }
   if (req.files) {
-    // TODO: Handle delete files
+    if (req.files instanceof Array) {
+      req.files.forEach((file) => {
+        deleteFile(file)
+      })
+    }
   }
 
   if (err instanceof HttpError) {

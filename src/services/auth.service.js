@@ -116,10 +116,8 @@ const refreshAuthTokens = async (accessToken, refreshToken) => {
   return tokenService.createAuthTokens(userId)
 }
 
-const authService = {
+module.exports = {
   login,
   logout,
   refreshAuthTokens,
 }
-
-module.exports = authService
