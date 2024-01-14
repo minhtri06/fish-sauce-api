@@ -6,6 +6,7 @@ const controller = require('../controllers/category.controller')
 
 router
   .route('/')
+  .get(controller.getAllCategories)
   .post(
     auth(),
     uploadImage('image'),

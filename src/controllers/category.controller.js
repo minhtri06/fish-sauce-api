@@ -11,4 +11,10 @@ const createCategory = async (req, res) => {
   return res.status(StatusCodes.CREATED).json({ category })
 }
 
-module.exports = { createCategory }
+/** @type {import('express').RequestHandler} */
+const getAllCategories = async (req, res) => {
+  const categories = await categoryService.getAllCategories()
+  return res.json({ categories })
+}
+
+module.exports = { createCategory, getAllCategories }

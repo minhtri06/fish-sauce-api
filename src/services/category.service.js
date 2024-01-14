@@ -10,4 +10,13 @@ const createCategory = async (body) => {
   return category
 }
 
-module.exports = { createCategory }
+/**
+ * Get all categories
+ * @returns {Promise<InstanceType<Category>[]>}
+ */
+const getAllCategories = async () => {
+  const categories = await Category.find()
+  return categories
+}
+
+module.exports = { createCategory, getAllCategories }
