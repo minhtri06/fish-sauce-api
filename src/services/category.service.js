@@ -26,12 +26,14 @@ const getAllCategories = async () => {
 }
 
 /**
- *
+ * Update category by id
  * @param {string} categoryId
  * @param {Partial<{ name: string, image: string }>} body
+ * @returns {Promise<InstanceType<Category>>}
  */
 const updateCategoryById = async (categoryId, body) => {
   body = pick(body, 'name', 'image')
+  console.log(body)
   const category = await Category.findById(categoryId)
   if (!category) {
     throw new HttpError(StatusCodes.NOT_FOUND, 'Category not found')
@@ -45,6 +47,7 @@ const updateCategoryById = async (categoryId, body) => {
   if (oldImage) {
     cloudinary.uploader.destroy(oldImage)
   }
+  return category
 }
 
 /**
@@ -70,4 +73,9 @@ const deleteCategoryById = async (categoryId) => {
   cloudinary.uploader.destroy(category.image)
 }
 
-module.exports = { createCategory, getAllCategories, deleteCategoryById }
+module.exports = {
+  createCategory,
+  getAllCategories,
+  updateCategoryById,
+  deleteCategoryById,
+}

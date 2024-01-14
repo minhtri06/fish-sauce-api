@@ -8,6 +8,15 @@ module.exports = {
     }),
   },
 
+  updateCategoryById: {
+    params: Joi.object({
+      categoryId: stringId.required(),
+    }),
+    body: Joi.object({
+      name: Joi.string(),
+    }),
+  },
+
   deleteCategoryById: {
     params: Joi.object({
       categoryId: stringId.required(),

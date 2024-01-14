@@ -16,7 +16,12 @@ router
 
 router
   .route('/:categoryId')
-  .patch()
+  .patch(
+    auth(),
+    uploadImage('image', { required: false }),
+    validate(validation.updateCategoryById),
+    controller.updateCategoryById,
+  )
   .delete(
     auth(),
     validate(validation.deleteCategoryById),
