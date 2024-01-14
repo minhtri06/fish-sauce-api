@@ -14,4 +14,13 @@ router
     controller.createCategory,
   )
 
+router
+  .route('/:categoryId')
+  .patch()
+  .delete(
+    auth(),
+    validate(validation.deleteCategoryById),
+    controller.deleteCategoryById,
+  )
+
 module.exports = router

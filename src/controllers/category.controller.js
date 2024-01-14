@@ -17,4 +17,11 @@ const getAllCategories = async (req, res) => {
   return res.json({ categories })
 }
 
-module.exports = { createCategory, getAllCategories }
+/** @type {import('express').RequestHandler} */
+const deleteCategoryById = async (req, res) => {
+  const { categoryId } = req.params
+  await categoryService.deleteCategoryById(categoryId)
+  return res.status(StatusCodes.NO_CONTENT).send()
+}
+
+module.exports = { createCategory, getAllCategories, deleteCategoryById }
