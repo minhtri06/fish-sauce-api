@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const { toJSONPlugin } = require('./plugins')
+const { toJSONPlugin, convertErrorPlugin } = require('./plugins')
 const { MODEL_NAMES } = require('../constants')
 
 const tagSchema = new mongoose.Schema(
@@ -11,6 +11,7 @@ const tagSchema = new mongoose.Schema(
 )
 
 tagSchema.plugin(toJSONPlugin)
+tagSchema.plugin(convertErrorPlugin)
 
 const Tag = mongoose.model(MODEL_NAMES.TAG, tagSchema)
 

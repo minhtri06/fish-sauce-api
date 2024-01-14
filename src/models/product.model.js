@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 const { MODEL_NAMES } = require('../constants')
-const { toJSONPlugin } = require('./plugins')
+const { toJSONPlugin, convertErrorPlugin } = require('./plugins')
 
 const productSchema = new mongoose.Schema(
   {
@@ -32,6 +32,7 @@ const productSchema = new mongoose.Schema(
 )
 
 productSchema.plugin(toJSONPlugin)
+productSchema.plugin(convertErrorPlugin)
 
 const Product = mongoose.model(MODEL_NAMES.PRODUCT, productSchema)
 

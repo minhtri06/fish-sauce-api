@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const { toJSONPlugin } = require('./plugins')
+const { toJSONPlugin, convertErrorPlugin } = require('./plugins')
 const { MODEL_NAMES } = require('../constants')
 
 const categorySchema = new mongoose.Schema(
@@ -14,6 +14,7 @@ const categorySchema = new mongoose.Schema(
 )
 
 categorySchema.plugin(toJSONPlugin)
+categorySchema.plugin(convertErrorPlugin)
 
 const Category = mongoose.model(MODEL_NAMES.CATEGORY, categorySchema)
 

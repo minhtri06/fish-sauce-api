@@ -27,7 +27,7 @@ const handleError = async (err, req, res, next) => {
 
   if (err instanceof HttpError) {
     if (isOnProduction) {
-      const { message, statusCode, type } = err
+      const { message, statusCode, type, details } = err
 
       if (statusCode === StatusCodes.UNAUTHORIZED) {
         return res.status(statusCode).json({ message: 'Unauthorized' })
@@ -37,23 +37,23 @@ const handleError = async (err, req, res, next) => {
         return res.status(statusCode).json({ message: 'Something went wrong' })
       }
 
-      return res.status(statusCode).json({ message, type })
+      return res.status(statusCode).json({ message, type, details })
     } else {
       console.log(err)
-      const { message, statusCode, type } = err
-      return res.status(statusCode).json({ message, type })
+      const { message, statusCode, type, details } = err
+      return res.status(statusCode).json({ message, type, details })
     }
   }
 
-  if (ENV_CONFIG.NODE_ENV !== 'prod') {
+  if (isOnProduction) {
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: 'Something went wrong' })
+  } else {
     console.log(err)
     return res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ message: err.message })
-  } else {
-    return res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: 'Something went wrong' })
   }
 }
 

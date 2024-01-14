@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
 const Joi = require('joi')
 
-const { toJSONPlugin } = require('./plugins')
+const { toJSONPlugin, convertErrorPlugin } = require('./plugins')
 const { MODEL_NAMES } = require('../constants')
 
 const emailValidator = Joi.string().email().required()
@@ -48,6 +48,7 @@ const userSchema = new mongoose.Schema(
 )
 
 userSchema.plugin(toJSONPlugin)
+userSchema.plugin(convertErrorPlugin)
 
 userSchema.pre('save', async function (next) {
   if (this.isModified('password')) {
