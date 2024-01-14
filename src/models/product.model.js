@@ -21,10 +21,18 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
 
-    images: { type: [String] },
+    images: {
+      type: [String],
+      validate(images) {
+        if (images.length === 0) {
+          throw new Error('Product required at least one image')
+        }
+      },
+    },
 
     tags: {
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: MODEL_NAMES.TAG }],
+      default: [],
     },
   },
 
