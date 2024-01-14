@@ -2,24 +2,24 @@ const Joi = require('joi')
 const { stringId } = require('./custom.validation')
 
 module.exports = {
-  createCategory: {
+  createTag: {
     body: {
       name: Joi.string().required(),
     },
   },
 
-  updateCategoryById: {
+  updateTagById: {
     params: {
-      categoryId: stringId.required(),
+      tagId: stringId.required(),
     },
     body: {
       name: Joi.string(),
     },
   },
 
-  deleteCategoryById: {
+  deleteTagById: {
     params: {
-      categoryId: stringId.required(),
+      tagId: stringId.required(),
     },
   },
 }

@@ -2,15 +2,15 @@ const Joi = require('joi')
 
 module.exports = {
   login: {
-    body: Joi.object({
+    body: {
       email: Joi.string().required(),
       password: Joi.string().required(),
-    }),
+    },
   },
 
   logout: {
-    body: Joi.object({
+    body: {
       refreshToken: Joi.string().required(),
-    }),
+    },
   },
 }
