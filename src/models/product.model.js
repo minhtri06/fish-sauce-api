@@ -1,19 +1,26 @@
 const mongoose = require('mongoose')
 
-const { MODEL_NAMES } = require('../constants')
+const { MODEL_NAMES, PRODUCT_STATUSES } = require('../constants')
 const { toJSONPlugin, convertErrorPlugin } = require('./plugins')
 
 const productSchema = new mongoose.Schema(
   {
     name: { type: String, trim: true, unique: true, required: true },
 
-    description: { type: String },
+    description: { type: String, required: true },
 
-    price: { type: Number, required: true, min: 0 },
+    price: { type: Number, min: 0, required: true },
 
-    discount: { type: Number, required: true, min: 0 },
+    discount: { type: Number, min: 0, default: 0, required: true },
 
-    isNew: { type: Boolean, required: true },
+    quantity: { type: Number, min: 0, default: 0, required: true },
+
+    status: {
+      type: String,
+      enum: Object.values(PRODUCT_STATUSES),
+      default: PRODUCT_STATUSES.ACTIVE,
+      required: true,
+    },
 
     category: {
       type: mongoose.Schema.Types.ObjectId,
@@ -32,11 +39,10 @@ const productSchema = new mongoose.Schema(
 
     tags: {
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: MODEL_NAMES.TAG }],
-      default: [],
     },
   },
 
-  { timestamps: true },
+  { timestamps: true, optimisticConcurrency: true },
 )
 
 productSchema.plugin(toJSONPlugin)

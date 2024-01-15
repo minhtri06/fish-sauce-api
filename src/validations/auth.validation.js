@@ -13,4 +13,11 @@ module.exports = {
       refreshToken: Joi.string().required(),
     },
   },
+
+  refreshTokens: {
+    body: {
+      accessToken: Joi.string().required(),
+      refreshToken: Joi.string().required(),
+    },
+  },
 }
