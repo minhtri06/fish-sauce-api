@@ -1,7 +1,5 @@
-const convertErrorPlugin = require('./convertError.plugin')
-const toJSONPlugin = require('./toJson.plugin')
-
 module.exports = {
-  convertErrorPlugin,
-  toJSONPlugin,
+  convertErrorPlugin: require('./convertError.plugin'),
+  toJSONPlugin: require('./toJson.plugin'),
+  paginatePlugin: require('./paginate.plugin'),
 }

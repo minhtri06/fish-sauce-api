@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const { toJSONPlugin, convertErrorPlugin } = require('./plugins')
+const { toJSONPlugin, convertErrorPlugin, paginatePlugin } = require('./plugins')
 const { MODEL_NAMES } = require('../constants')
 
 const categorySchema = new mongoose.Schema(
@@ -15,6 +15,7 @@ const categorySchema = new mongoose.Schema(
 
 categorySchema.plugin(toJSONPlugin)
 categorySchema.plugin(convertErrorPlugin)
+categorySchema.plugin(paginatePlugin)
 
 const Category = mongoose.model(MODEL_NAMES.CATEGORY, categorySchema)
 
