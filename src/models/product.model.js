@@ -42,7 +42,10 @@ const productSchema = new mongoose.Schema(
     },
   },
 
-  { timestamps: true, optimisticConcurrency: true },
+  {
+    timestamps: true,
+    optimisticConcurrency: true,
+  },
 )
 
 productSchema.plugin(toJSONPlugin)

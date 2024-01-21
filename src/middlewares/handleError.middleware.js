@@ -26,9 +26,9 @@ const handleError = async (err, req, res, next) => {
   }
 
   if (err instanceof HttpError) {
-    if (isOnProduction) {
-      const { message, statusCode, type, details } = err
+    const { message, statusCode, type, details, duplicateKeys } = err
 
+    if (isOnProduction) {
       if (statusCode === StatusCodes.UNAUTHORIZED) {
         return res.status(statusCode).json({ message: 'Unauthorized' })
       }
@@ -37,23 +37,18 @@ const handleError = async (err, req, res, next) => {
         return res.status(statusCode).json({ message: 'Something went wrong' })
       }
 
-      return res.status(statusCode).json({ message, type, details })
+      return res.status(statusCode).json({ message, type, details, duplicateKeys })
     } else {
       console.log(err)
-      const { message, statusCode, type, details } = err
-      return res.status(statusCode).json({ message, type, details })
+      return res.status(statusCode).json({ message, type, details, duplicateKeys })
     }
   }
 
   if (isOnProduction) {
-    return res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: 'Something went wrong' })
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Something went wrong' })
   } else {
     console.log(err)
-    return res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: err.message })
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: err.message })
   }
 }
 

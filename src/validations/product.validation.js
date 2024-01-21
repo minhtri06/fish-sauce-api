@@ -1,5 +1,6 @@
 const Joi = require('joi')
-const { stringId } = require('./custom.validation')
+const { stringId, page, limit } = require('./custom.validation')
+const { stringify } = require('nodemon/lib/utils')
 
 module.exports = {
   createProduct: {
@@ -11,7 +12,18 @@ module.exports = {
       quantity: Joi.number().integer().min(0),
       status: Joi.string(),
       category: stringId.required(),
-      tags: Joi.array().items(stringId).required(),
+      tags: Joi.array().items(Joi.string()).required(),
+    },
+  },
+
+  getProducts: {
+    query: {
+      categoryId: stringId,
+      tagIds: Joi.array().items(Joi.string()),
+      page: page,
+      limit: limit,
+      checkPaginate: Joi.boolean(),
+      sort: Joi.string(),
     },
   },
 }

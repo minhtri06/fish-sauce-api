@@ -12,4 +12,15 @@ const createProduct = async (req, res) => {
   return res.status(StatusCodes.CREATED).json({ product })
 }
 
-module.exports = { createProduct }
+/** @type {controller} */
+const getProducts = async (req, res) => {
+  let select = '*'
+  if (!req.user) {
+    // if not admin
+    select = '-quantity -status'
+  }
+  const result = await productService.getProducts({ ...req.query, select })
+  return res.json(result)
+}
+
+module.exports = { createProduct, getProducts }

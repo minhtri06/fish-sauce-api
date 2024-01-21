@@ -1,3 +1,4 @@
+const { validateSortString } = require('../helpers')
 const Product = require('../models/product.model')
 const { pick } = require('../utils')
 
@@ -33,4 +34,28 @@ const createProduct = async (body) => {
   return product
 }
 
-module.exports = { createProduct }
+/**
+ *
+ * @param {{
+ *  categoryId?: string,
+ *  tagIds?: string[],
+ *  page?: number,
+ *  limit?: number
+ * }} param0
+ */
+const getProducts = async ({ categoryId, tagIds, page, limit, select, checkPaginate, sort }) => {
+  const filter = {}
+  if (categoryId) {
+    filter.category = categoryId
+  }
+  if (tagIds && tagIds.length !== 0) {
+    filter.tags = { $in: tagIds }
+  }
+  if (sort) {
+    validateSortString(sort, ['price', 'createdAt'])
+  }
+  const result = await Product.paginate(filter, { page, limit, select, checkPaginate, sort })
+  return result
+}
+
+module.exports = { createProduct, getProducts }

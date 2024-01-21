@@ -18,17 +18,16 @@ const convertErrorPlugin = (schema) => {
     }
 
     // mongodb duplicate error
-    if (
-      error instanceof mongoose.mongo.MongoServerError &&
-      error.code === 11000
-    ) {
+    if (error instanceof mongoose.mongo.MongoServerError && error.code === 11000) {
       const keyValue = error.keyValue
-      const message = Object.keys(keyValue)
+      const duplicateKeys = Object.keys(keyValue)
+      const message = duplicateKeys
         .map((key) => `${key} '${keyValue[key]}' already exists`)
         .join(', ')
       return next(
         new HttpError(StatusCodes.BAD_REQUEST, message, {
           type: 'duplicate-key',
+          duplicateKeys,
         }),
       )
     }
