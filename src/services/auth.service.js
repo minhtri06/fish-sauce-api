@@ -80,10 +80,7 @@ const refreshAuthTokens = async (accessToken, refreshToken) => {
 
   const now = moment().unix()
   if (accessPayload.exp > now) {
-    throw new HttpError(
-      StatusCodes.UNAUTHORIZED,
-      'Access token has not expired',
-    )
+    throw new HttpError(StatusCodes.UNAUTHORIZED, 'Access token has not expired')
   }
   if (refreshPayload.exp < now) {
     throw new HttpError(StatusCodes.UNAUTHORIZED, 'Refresh token has expired')
@@ -93,27 +90,26 @@ const refreshAuthTokens = async (accessToken, refreshToken) => {
     throw new HttpError(StatusCodes.UNAUTHORIZED, 'Invalid token')
   }
 
-  const refreshTokenDoc = await Token.findOne({
-    body: refreshToken,
-    type: REFRESH_TOKEN,
-  })
-
-  if (refreshTokenDoc.isBlacklisted) {
-    throw new HttpError(StatusCodes.UNAUTHORIZED, 'Unauthorized')
-  }
-
   const userId = refreshPayload.sub
-  if (refreshTokenDoc.isUsed || refreshTokenDoc.isRevoked) {
-    // If refresh token is already used or revoked => blacklist this token and all usable refresh tokens of that user
-    refreshTokenDoc.isBlacklisted = true
-    await refreshTokenDoc.save()
+
+  const newAuthTokens = await tokenService.createAuthTokens(userId)
+
+  const refreshTokenDoc = await Token.findOneAndUpdate(
+    {
+      body: refreshToken,
+      type: REFRESH_TOKEN,
+      isBlacklisted: false,
+      isUsed: false,
+      isRevoked: false,
+    },
+    { isUsed: true },
+  )
+  if (!refreshTokenDoc) {
     await tokenService.blackListAUser(userId)
     throw new HttpError(StatusCodes.UNAUTHORIZED, 'Unauthorized')
   }
 
-  refreshTokenDoc.isUsed = true
-  await refreshTokenDoc.save()
-  return tokenService.createAuthTokens(userId)
+  return newAuthTokens
 }
 
 module.exports = {
