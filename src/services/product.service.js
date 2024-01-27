@@ -43,7 +43,15 @@ const createProduct = async (body) => {
  *  limit?: number
  * }} param0
  */
-const getProducts = async ({ categoryId, tagIds, page, limit, select, checkPaginate, sort }) => {
+const getProducts = async ({
+  categoryId,
+  tagIds,
+  page,
+  limit,
+  select,
+  checkPaginate,
+  sort,
+}) => {
   const filter = {}
   if (categoryId) {
     filter.category = categoryId
@@ -54,7 +62,14 @@ const getProducts = async ({ categoryId, tagIds, page, limit, select, checkPagin
   if (sort) {
     validateSortString(sort, ['price', 'createdAt'])
   }
-  const result = await Product.paginate(filter, { page, limit, select, checkPaginate, sort })
+  const result = await Product.paginate(filter, {
+    page,
+    limit,
+    select,
+    checkPaginate,
+    sort,
+    populate: 'category',
+  })
   return result
 }
 
