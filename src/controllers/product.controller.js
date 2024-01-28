@@ -14,7 +14,7 @@ const createProduct = async (req, res) => {
 
 /** @type {controller} */
 const getProducts = async (req, res) => {
-  let select = '*'
+  let select = ''
   if (!req.user) {
     // if not admin
     select = '-quantity -status'
@@ -23,4 +23,33 @@ const getProducts = async (req, res) => {
   return res.json(result)
 }
 
-module.exports = { createProduct, getProducts }
+/** @type {controller} */
+const getProductById = async (req, res) => {
+  const { productId } = req.params
+  const isAdmin = !!req.user
+  const product = await productService.getProductById(productId, isAdmin)
+  return res.json({ product })
+}
+
+/** @type {controller} */
+const updateProduct = async (req, res) => {
+  const { productId } = req.params
+  const product = await productService.updateProduct(productId, req.body)
+  return res.json({ product })
+}
+
+/** @type {controller} */
+const updateProductQuantity = async (req, res) => {
+  const { productId } = req.params
+  const { quantityChange } = req.body
+  const product = await productService.updateProductQuantity(productId, quantityChange)
+  return res.json({ product })
+}
+
+module.exports = {
+  createProduct,
+  getProducts,
+  getProductById,
+  updateProduct,
+  updateProductQuantity,
+}

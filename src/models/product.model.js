@@ -11,7 +11,17 @@ const productSchema = new mongoose.Schema(
 
     price: { type: Number, min: 0, required: true },
 
-    discount: { type: Number, min: 0, default: 0, required: true },
+    discount: {
+      type: Number,
+      min: 0,
+      default: 0,
+      validate: function () {
+        if (this.discount > this.price) {
+          throw new Error('Discount cannot greater than price')
+        }
+      },
+      required: true,
+    },
 
     quantity: { type: Number, min: 0, default: 0, required: true },
 
