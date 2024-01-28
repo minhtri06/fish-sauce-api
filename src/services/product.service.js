@@ -5,6 +5,7 @@ const Category = require('../models/category.model')
 const Tag = require('../models/tag.model')
 const { pick } = require('../utils')
 const { StatusCodes } = require('http-status-codes')
+const { cloudinary } = require('../configs/cloudinary.config')
 
 /**
  * Create product
@@ -168,10 +169,47 @@ const updateProductQuantity = async (productId, quantityChange) => {
   return product
 }
 
+/**
+ * Add images
+ * @param {string} productId
+ * @param {string[]} newImages
+ * @returns {Promise<InstanceType<Product>>}
+ */
+const addImages = async (productId, newImages) => {
+  if (!newImages) {
+    throw new HttpError(StatusCodes.BAD_REQUEST, 'Images are required')
+  }
+  const product = await Product.findById(productId)
+  if (!product) {
+    throw new HttpError(StatusCodes.NOT_FOUND, 'Product not found')
+  }
+  product.images.push(...newImages)
+  await product.save()
+  return product
+}
+
+/**
+ *
+ * @param {string} productId
+ * @param {string[]} removedImages
+ */
+const removeImages = async (productId, removedImages) => {
+  const product = await Product.findById(productId)
+  if (!product) {
+    throw new HttpError(StatusCodes.NOT_FOUND, 'Product not found')
+  }
+  cloudinary.api.delete_resources(removedImages)
+  product.images.pull(...removedImages)
+  await product.save()
+  return product
+}
+
 module.exports = {
   createProduct,
   getProducts,
   getProductById,
   updateProduct,
   updateProductQuantity,
+  addImages,
+  removeImages,
 }

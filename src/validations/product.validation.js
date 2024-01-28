@@ -55,4 +55,19 @@ module.exports = {
       quantityChange: Joi.number().integer().required(),
     },
   },
+
+  addImages: {
+    params: {
+      productId: stringId.required(),
+    },
+  },
+
+  removeImages: {
+    params: {
+      productId: stringId.required(),
+    },
+    body: {
+      removedImages: Joi.array().items(Joi.string()).required(),
+    },
+  },
 }

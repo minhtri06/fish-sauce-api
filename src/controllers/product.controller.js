@@ -1,6 +1,7 @@
 const { StatusCodes } = require('http-status-codes')
 
 const productService = require('../services/product.service')
+const { HttpError } = require('../helpers')
 
 /** @typedef {import('express').RequestHandler} controller */
 
@@ -42,10 +43,31 @@ const updateProductQuantity = async (req, res) => {
   return res.json({ product })
 }
 
+/** @type {controller} */
+const addImages = async (req, res) => {
+  const { productId } = req.params
+  if (!req.files) {
+    throw new HttpError(StatusCodes.BAD_REQUEST, 'Images is required')
+  }
+  const newImages = req.files.map((file) => file.filename)
+  const product = await productService.addImages(productId, newImages)
+  return res.json({ product })
+}
+
+/** @type {controller} */
+const removeImages = async (req, res) => {
+  const { productId } = req.params
+  const { removedImages } = req.body
+  const product = await productService.removeImages(productId, removedImages)
+  return res.json({ product })
+}
+
 module.exports = {
   createProduct,
   getProducts,
   getProductById,
   updateProduct,
   updateProductQuantity,
+  addImages,
+  removeImages,
 }
