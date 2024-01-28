@@ -44,17 +44,19 @@ const createProduct = async (body) => {
  *  page?: number,
  *  limit?: number
  * }} param0
+ * @param {boolean} isAdmin
+ * @returns {Promise<{data: InstanceType<Product>[]}>}
  */
-const getProducts = async ({
-  categoryId,
-  tagIds,
-  page,
-  limit,
-  select,
-  checkPaginate,
-  sort,
-}) => {
+const getProducts = async (
+  { categoryId, tagIds, page, limit, checkPaginate, sort },
+  isAdmin,
+) => {
   const filter = {}
+  let select = ''
+  if (!isAdmin) {
+    filter.status = PRODUCT_STATUSES.ACTIVE
+    select = '-quantity -status'
+  }
   if (categoryId) {
     filter.category = categoryId
   }

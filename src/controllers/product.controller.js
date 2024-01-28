@@ -14,12 +14,8 @@ const createProduct = async (req, res) => {
 
 /** @type {controller} */
 const getProducts = async (req, res) => {
-  let select = ''
-  if (!req.user) {
-    // if not admin
-    select = '-quantity -status'
-  }
-  const result = await productService.getProducts({ ...req.query, select })
+  const isAdmin = !!req.user
+  const result = await productService.getProducts(req.query, isAdmin)
   return res.json(result)
 }
 
