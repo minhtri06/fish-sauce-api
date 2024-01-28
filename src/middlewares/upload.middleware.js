@@ -16,6 +16,7 @@ const imageUploader = multer({
       cb(null, true)
     }
   },
+  limits: { fileSize: 20 * 1024 * 1024 },
 })
 
 /** @typedef {import('express').RequestHandler} middleware */
