@@ -89,6 +89,12 @@ const getProducts = async (
   return result
 }
 
+/**
+ * Get product by id
+ * @param {string} productId
+ * @param {boolean} isAdmin
+ * @returns {Promise<InstanceType<Product>>}
+ */
 const getProductById = async (productId, isAdmin) => {
   const query = Product.findById(productId).populate(['category', 'tags'])
   if (!isAdmin) {
@@ -117,6 +123,18 @@ const getProductById = async (productId, isAdmin) => {
  * @returns {Promise<InstanceType<Product>>}
  */
 const updateProduct = async (productId, body) => {
+  if (body.category) {
+    const categoryCount = await Category.countDocuments({ _id: body.category })
+    if (categoryCount === 0) {
+      throw new HttpError(StatusCodes.BAD_REQUEST, 'Category does not exist')
+    }
+  }
+  if (body.tags) {
+    const tagCount = await Tag.countDocuments({ _id: { $in: body.tags } })
+    if (tagCount !== body.tags.length) {
+      throw new HttpError(StatusCodes.BAD_REQUEST, 'Tag does not exist')
+    }
+  }
   const product = await Product.findById(productId)
   if (!product) {
     throw new HttpError(StatusCodes.NOT_FOUND, 'Product not found')
