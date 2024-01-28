@@ -1,12 +1,14 @@
 const { PRODUCT_STATUSES } = require('../constants')
 const { validateSortString, HttpError } = require('../helpers')
 const Product = require('../models/product.model')
+const Category = require('../models/category.model')
+const Tag = require('../models/tag.model')
 const { pick } = require('../utils')
 const { StatusCodes } = require('http-status-codes')
 
 /**
  * Create product
- * @param {
+ * @param {{
  *  name: string
  *  description?: string
  *  price: number
@@ -16,7 +18,7 @@ const { StatusCodes } = require('http-status-codes')
  *  category: string
  *  images: string[]
  *  tags?: string[]
- * } body
+ * }} body
  * @returns {Promise<InstanceType<Product>>}
  */
 const createProduct = async (body) => {
@@ -32,6 +34,16 @@ const createProduct = async (body) => {
     'images',
     'tags',
   )
+  const [categoryCount, tagCount] = await Promise.all([
+    Category.countDocuments({ _id: body.category }),
+    Tag.countDocuments({ _id: { $in: body.tags } }),
+  ])
+  if (categoryCount === 0) {
+    throw new HttpError(StatusCodes.BAD_REQUEST, 'Category does not exist')
+  }
+  if (tagCount !== body.tags.length) {
+    throw new HttpError(StatusCodes.BAD_REQUEST, 'Tag does not exist')
+  }
   const product = await Product.create(body)
   return product
 }

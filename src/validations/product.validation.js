@@ -11,7 +11,7 @@ module.exports = {
       quantity: Joi.number().integer().min(0),
       status: Joi.string(),
       category: stringId.required(),
-      tags: Joi.array().items(Joi.string()).required(),
+      tags: Joi.array().items(stringId).unique().required(),
     },
   },
 
@@ -42,8 +42,8 @@ module.exports = {
       price: Joi.number().integer().min(0),
       discount: Joi.number().integer().min(0),
       status: Joi.string(),
-      category: Joi.string(),
-      tags: Joi.array().items(Joi.string()),
+      category: stringId,
+      tags: Joi.array().items(stringId).unique(),
     },
   },
 
