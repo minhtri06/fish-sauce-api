@@ -15,7 +15,7 @@ app.use(helmet())
 
 app.use(
   cors({
-    origin: ENV_CONFIG.CLIENT_URL,
+    origin: [ENV_CONFIG.CLIENT_URL, 'https://fish-sauce-next.vercel.app'],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   }),
 )
