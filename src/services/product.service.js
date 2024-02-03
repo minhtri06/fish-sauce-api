@@ -120,10 +120,12 @@ const getProductById = async (productId, isAdmin) => {
  *  status: string
  *  category: string
  *  tags: string[]
+ *  images: string[]
  * }} body
+ * @param {string[] | undefined} newImages
  * @returns {Promise<InstanceType<Product>>}
  */
-const updateProduct = async (productId, body) => {
+const updateProduct = async (productId, body, newImages) => {
   if (body.category) {
     const categoryCount = await Category.countDocuments({ _id: body.category })
     if (categoryCount === 0) {
@@ -141,10 +143,20 @@ const updateProduct = async (productId, body) => {
     throw new HttpError(StatusCodes.NOT_FOUND, 'Product not found')
   }
 
+  if (body.images) {
+    const removedImages = product.images.filter((image) => !body.images.includes(image))
+    cloudinary.api.delete_resources(removedImages)
+    product.images.pull(...removedImages)
+  }
+  if (newImages) {
+    product.images.push(...newImages)
+  }
+
   Object.assign(
     product,
     pick(body, 'name', 'description', 'price', 'discount', 'status', 'category', 'tags'),
   )
+
   await product.save()
 
   return product

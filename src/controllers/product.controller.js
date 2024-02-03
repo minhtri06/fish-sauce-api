@@ -31,7 +31,8 @@ const getProductById = async (req, res) => {
 /** @type {controller} */
 const updateProduct = async (req, res) => {
   const { productId } = req.params
-  const product = await productService.updateProduct(productId, req.body)
+  const newImages = req.files?.map((file) => file.filename)
+  const product = await productService.updateProduct(productId, req.body, newImages)
   return res.json({ product })
 }
 

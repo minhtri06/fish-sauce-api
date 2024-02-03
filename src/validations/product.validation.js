@@ -44,6 +44,7 @@ module.exports = {
       status: Joi.string(),
       category: stringId,
       tags: Joi.array().items(stringId).unique(),
+      images: Joi.array().items(Joi.string()),
     },
   },
 
