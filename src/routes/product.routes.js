@@ -40,14 +40,4 @@ router.patch(
   controller.updateProductQuantity,
 )
 
-router
-  .route('/:productId/images')
-  .post(
-    auth(),
-    uploadManyImages('images', { maxCount: 10 }),
-    validate(validation.addImages),
-    controller.addImages,
-  )
-  .delete(auth(), validate(validation.removeImages), controller.removeImages)
-
 module.exports = router
