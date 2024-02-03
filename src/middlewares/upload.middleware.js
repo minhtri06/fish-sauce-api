@@ -38,6 +38,12 @@ const uploadImage = (fieldName, { required } = { required: true }) => {
           throw new HttpError(StatusCodes.BAD_REQUEST, `${fieldName} is required`)
         }
       }
+
+      const { _jsonData } = req.body
+      if (_jsonData && typeof _jsonData === 'string') {
+        req.body = JSON.parse(_jsonData)
+      }
+
       return next()
     },
   ]
@@ -60,6 +66,12 @@ const uploadManyImages = (fieldName, { maxCount = 100, required = true } = {}) =
           throw new HttpError(StatusCodes.BAD_REQUEST, `'${fieldName}' is required`)
         }
       }
+
+      const { _jsonData } = req.body
+      if (_jsonData && typeof _jsonData === 'string') {
+        req.body = JSON.parse(_jsonData)
+      }
+
       return next()
     },
   ]
