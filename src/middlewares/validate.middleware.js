@@ -23,7 +23,7 @@ const validate = (schema) => {
         errors: { wrap: { label: '' } },
       })
       if (error) {
-        next(new HttpError(StatusCodes.BAD_REQUEST, error.message))
+        return next(new HttpError(StatusCodes.BAD_REQUEST, error.message))
       } else {
         req[prop] = value
       }

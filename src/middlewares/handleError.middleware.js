@@ -45,7 +45,9 @@ const handleError = async (err, req, res, next) => {
   }
 
   if (isOnProduction) {
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Something went wrong' })
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: 'Something went wrong' })
   } else {
     console.log(err)
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: err.message })

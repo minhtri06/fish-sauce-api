@@ -26,7 +26,12 @@ router
     validate(validation.getProductById),
     controller.getProductById,
   )
-  .patch(auth(), validate(validation.updateProduct), controller.updateProduct)
+  .patch(
+    auth(),
+    uploadManyImages('newImages', { required: false }),
+    validate(validation.updateProduct),
+    controller.updateProduct,
+  )
 
 router.patch(
   '/:productId/quantity',
