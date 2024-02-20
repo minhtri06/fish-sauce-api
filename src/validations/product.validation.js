@@ -23,6 +23,8 @@ module.exports = {
       limit: limit,
       checkPaginate: Joi.boolean(),
       sort: Joi.string(),
+      status: Joi.string(),
+      name: Joi.string(),
     },
   },
 

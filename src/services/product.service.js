@@ -61,20 +61,33 @@ const createProduct = async (body) => {
  * @returns {Promise<{data: InstanceType<Product>[]}>}
  */
 const getProducts = async (
-  { categoryId, tagIds, page, limit, checkPaginate, sort },
+  { categoryId, tagIds, page, limit, checkPaginate, sort, status, name },
   isAdmin,
 ) => {
   const filter = {}
+
   let select = ''
   if (!isAdmin) {
+    // non-admin user can only get active products
     filter.status = PRODUCT_STATUSES.ACTIVE
+    // non-admin user can only get product with quantity > 0
+    filter.quantity = { $gt: 0 }
+    // non-admin user cannot see quantity, status
     select = '-quantity -status'
+  } else {
+    if (status) {
+      filter.status = status
+    }
   }
+
   if (categoryId) {
     filter.category = categoryId
   }
   if (tagIds && tagIds.length !== 0) {
     filter.tags = { $in: tagIds }
+  }
+  if (name && name !== '') {
+    filter.$text = { $search: `"${name}"` }
   }
   if (sort) {
     validateSortString(sort, ['price', 'createdAt'])

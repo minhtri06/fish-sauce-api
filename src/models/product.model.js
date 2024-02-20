@@ -58,6 +58,8 @@ const productSchema = new mongoose.Schema(
   },
 )
 
+productSchema.index({ name: 'text' })
+
 productSchema.plugin(toJSONPlugin)
 productSchema.plugin(convertErrorPlugin)
 productSchema.plugin(paginatePlugin)
