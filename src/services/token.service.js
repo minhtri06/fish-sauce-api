@@ -4,7 +4,7 @@ const { StatusCodes } = require('http-status-codes')
 
 const Token = require('../models/token.model')
 const { HttpError } = require('../helpers')
-const { ACCESS_TOKEN, REFRESH_TOKEN } = require('../constants').TOKEN_TYPES
+const { ACCESS_TOKEN, REFRESH_TOKEN } = require('../common/constants').TOKEN_TYPES
 const {
   JWT: { SECRET, ACCESS_EXPIRATION_MINUTES, REFRESH_EXPIRATION_DAYS },
 } = require('../configs/env.config')

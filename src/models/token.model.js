@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const { TOKEN_TYPES, MODEL_NAMES } = require('../constants')
+const { TOKEN_TYPES, MODEL_NAMES } = require('../common/constants')
 const { toJSONPlugin } = require('./plugins')
 
 const tokenSchema = new mongoose.Schema(

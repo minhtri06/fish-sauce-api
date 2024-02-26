@@ -11,6 +11,8 @@ const router = require('./routes')
 
 const app = express()
 
+// TODO: config rate-limit.
+
 app.use(helmet())
 
 app.use(

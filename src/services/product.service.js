@@ -1,4 +1,4 @@
-const { PRODUCT_STATUSES } = require('../constants')
+const { PRODUCT_STATUSES } = require('../common/constants')
 const { validateSortString, HttpError } = require('../helpers')
 const Product = require('../models/product.model')
 const Category = require('../models/category.model')

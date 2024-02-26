@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs')
 const Joi = require('joi')
 
 const { toJSONPlugin, convertErrorPlugin, paginatePlugin } = require('./plugins')
-const { MODEL_NAMES } = require('../constants')
+const { MODEL_NAMES } = require('../common/constants')
 
 const emailValidator = Joi.string().email().required()
 

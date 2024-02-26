@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const { toJSONPlugin, convertErrorPlugin, paginatePlugin } = require('./plugins')
-const { MODEL_NAMES } = require('../constants')
+const { MODEL_NAMES } = require('../common/constants')
 
 const tagSchema = new mongoose.Schema(
   {

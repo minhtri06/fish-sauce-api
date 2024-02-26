@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const { MODEL_NAMES, PRODUCT_STATUSES } = require('../constants')
+const { MODEL_NAMES, PRODUCT_STATUSES } = require('../common/constants')
 const { toJSONPlugin, convertErrorPlugin, paginatePlugin } = require('./plugins')
 
 const productSchema = new mongoose.Schema(
