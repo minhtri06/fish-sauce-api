@@ -8,7 +8,7 @@ const moment = require('moment')
 const envConfig = require('../configs/env.config')
 const {
   TOKEN_TYPES: { ACCESS_TOKEN, REFRESH_TOKEN },
-} = require('../constants')
+} = require('../common/constants')
 const User = require('../models/user.model')
 const tokenService = require('./token.service')
 const { HttpError } = require('../helpers')
