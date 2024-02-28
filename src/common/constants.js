@@ -13,8 +13,11 @@ module.exports = Object.freeze({
 
   MODEL_NAMES: {
     CATEGORY: 'Category',
+    COMMUNE: 'Commune',
+    DISTRICT: 'District',
     INVOICE: 'Invoice',
     PRODUCT: 'Product',
+    PROVINCE: 'Province',
     TAG: 'Tag',
     TOKEN: 'Token',
     USER: 'User',

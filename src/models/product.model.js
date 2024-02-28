@@ -58,6 +58,7 @@ const productSchema = new mongoose.Schema(
   },
 )
 
+// enable full-text search
 productSchema.index({ name: 'text' })
 
 productSchema.plugin(toJSONPlugin)

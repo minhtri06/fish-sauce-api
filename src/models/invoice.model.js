@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 
 const { MODEL_NAMES, INVOICE_STATUSES, PAYMENT_METHODS } = require('../common/constants')
+const { toJSONPlugin, convertErrorPlugin, paginatePlugin } = require('./plugins')
 
 const invoiceSchema = new mongoose.Schema(
   {
@@ -23,17 +24,25 @@ const invoiceSchema = new mongoose.Schema(
 
     customerName: { type: String, trim: true, required: true },
 
-    totalPrice: { type: Number, min: 0, required: true },
-
     phoneNumber: { type: String, required: true },
+
+    hasPhoneNumberPurchasedBefore: { type: Boolean, required: true },
+
+    email: { type: String },
+
+    hasEmailPurchasedBefore: { type: Boolean, required: true },
 
     province: { type: String, required: true },
 
+    provinceCode: { type: Number, required: true },
+
     district: { type: String, required: true },
+
+    districtCode: { type: String, required: true },
 
     address: { type: String, required: true },
 
-    email: { type: String },
+    totalPrice: { type: Number, min: 0, required: true },
 
     paymentMethod: { type: String, enum: Object.values(PAYMENT_METHODS), required: true },
 
@@ -52,7 +61,16 @@ const invoiceSchema = new mongoose.Schema(
     },
   },
 
-  { timestamps: true, optimisticConcurrency: true },
+  {
+    timestamps: true,
+    optimisticConcurrency: true,
+  },
 )
 
+invoiceSchema.plugin(toJSONPlugin)
+invoiceSchema.plugin(convertErrorPlugin)
+invoiceSchema.plugin(paginatePlugin)
+
 const Invoice = mongoose.model(MODEL_NAMES.INVOICE, invoiceSchema)
+
+module.exports = Invoice

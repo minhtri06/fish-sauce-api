@@ -1,6 +1,5 @@
-const { connectMongoDb, setupUser } = require('./mongo.db')
+const { connectMongoDb } = require('./mongo.db')
 
 module.exports = {
   connectMongoDb,
-  setupUser,
 }
