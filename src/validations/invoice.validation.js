@@ -14,6 +14,8 @@ module.exports = {
           }).required(),
         )
         .min(1)
+        .unique((item1, item2) => item1.productId === item2.productId)
+        .message({ 'array.unique': 'Duplicate productId' })
         .required(),
       customerName: Joi.string().required(),
       phoneNumber: Joi.string()

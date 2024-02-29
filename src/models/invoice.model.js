@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 
 const { MODEL_NAMES, INVOICE_STATUSES, PAYMENT_METHODS } = require('../common/constants')
 const { toJSONPlugin, convertErrorPlugin, paginatePlugin } = require('./plugins')
+const { isUniqueArray } = require('../utils')
 
 const invoiceSchema = new mongoose.Schema(
   {
@@ -22,6 +23,10 @@ const invoiceSchema = new mongoose.Schema(
       validate: function (products) {
         if (products.length === 0) {
           throw new Error('Invoice cannot have 0 products')
+        }
+        const productIds = products.map((p) => p.product.toString())
+        if (!isUniqueArray(productIds)) {
+          throw new Error('Duplicate product id')
         }
       },
       required: true,
