@@ -72,8 +72,8 @@ const getProducts = async (
     filter.status = PRODUCT_STATUSES.ACTIVE
     // non-admin user can only get product with quantity > 0
     filter.quantity = { $gt: 0 }
-    // non-admin user cannot see quantity, status
-    select = '-quantity -status'
+    // non-admin user cannot see status
+    select = '-status'
   } else {
     if (status) {
       filter.status = status
@@ -112,7 +112,7 @@ const getProducts = async (
 const getProductById = async (productId, isAdmin) => {
   const query = Product.findById(productId).populate(['category', 'tags'])
   if (!isAdmin) {
-    query.select('-quantity -status')
+    query.select('-status')
     query.where('status', PRODUCT_STATUSES.ACTIVE)
   }
   const product = await query.exec()
