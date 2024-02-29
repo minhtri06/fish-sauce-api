@@ -9,7 +9,10 @@ const invoiceService = require('../services/invoice.service')
 /** @type {controller} */
 const createInvoice = async (req, res) => {
   const invoice = await invoiceService.createInvoice(req.body)
-  return res.status(StatusCodes.CREATED).json({ invoice })
+  return res.status(StatusCodes.CREATED).json({
+    message: 'Create invoice successfully',
+    invoice,
+  })
 }
 
 module.exports = { createInvoice }
