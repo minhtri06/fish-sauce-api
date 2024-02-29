@@ -24,13 +24,9 @@ const invoiceSchema = new mongoose.Schema(
 
     customerName: { type: String, trim: true, required: true },
 
-    phoneNumber: { type: String, required: true },
-
-    hasPhoneNumberPurchasedBefore: { type: Boolean, required: true },
+    phoneNumber: { type: String, trim: true, required: true },
 
     email: { type: String },
-
-    hasEmailPurchasedBefore: { type: Boolean, required: true },
 
     province: { type: String, required: true },
 
@@ -38,7 +34,11 @@ const invoiceSchema = new mongoose.Schema(
 
     district: { type: String, required: true },
 
-    districtCode: { type: String, required: true },
+    districtCode: { type: Number, required: true },
+
+    commune: { type: String, required: true },
+
+    communeCode: { type: Number, required: true },
 
     address: { type: String, required: true },
 
