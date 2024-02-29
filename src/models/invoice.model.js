@@ -8,6 +8,11 @@ const invoiceSchema = new mongoose.Schema(
     products: {
       type: [
         {
+          product: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: MODEL_NAMES.PRODUCT,
+            required: true,
+          },
           name: { type: String, required: true },
           price: { type: Number, min: 0, required: true },
           discount: { type: Number, min: 0, default: 0, required: true },

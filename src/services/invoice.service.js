@@ -12,16 +12,17 @@ const { PAYMENT_METHODS, INVOICE_STATUSES } = require('../common/constants')
 /**
  * Create an invoice
  * @param {{
- *  products: { productId: string, quantity: number }[],
- *  customerName: string,
- *  phoneNumber: string,
- *  email: string,
- *  provinceCode: number,
- *  districtCode: number,
- *  communeCode: number,
- *  address: string,
- *  paymentMethod: 'cod' | 'momo'
+ *   products: { productId: string, quantity: number }[],
+ *   customerName: string,
+ *   phoneNumber: string,
+ *   email: string,
+ *   provinceCode: number,
+ *   districtCode: number,
+ *   communeCode: number,
+ *   address: string,
+ *   paymentMethod: 'cod' | 'momo'
  * }} body
+ * @returns {Promise<InstanceType<Invoice>>}
  */
 const createInvoice = async (body) => {
   body = pick(
@@ -37,14 +38,58 @@ const createInvoice = async (body) => {
     'paymentMethod',
   )
 
-  const [province, district, commune, products] = await Promise.all([
-    Province.findOne({ code: body.provinceCode }),
+  const { province, district, commune } = await validateLocation(body)
 
-    District.findOne({ code: body.districtCode }),
+  const products = await pickUpProducts(body.products)
 
-    Commune.findOne({ code: body.communeCode }),
+  body.products = products
 
-    pickUpProducts(body.products),
+  const invoice = new Invoice(body)
+
+  invoice.province = province.name
+  invoice.district = district.name
+  invoice.commune = commune.name
+
+  let totalPrice = 0
+  products.forEach((p) => {
+    totalPrice += (p.price - p.discount) * p.quantity
+  })
+  invoice.totalPrice = totalPrice
+
+  if (body.paymentMethod === PAYMENT_METHODS.COD) {
+    invoice.status = INVOICE_STATUSES.WAITING_FOR_DELIVERY
+  }
+  if (body.paymentMethod === PAYMENT_METHODS.MOMO) {
+    invoice.status = INVOICE_STATUSES.WAITING_FOR_PAYMENT
+  }
+
+  try {
+    await invoice.save()
+    return invoice
+  } catch (error) {
+    const sendBackItems = products.map((p) => ({
+      productId: p.product,
+      quantity: p.quantity,
+    }))
+    await sendBackProducts(sendBackItems)
+    throw error
+  }
+}
+
+/**
+ * Validate location
+ * @param {{ provinceCode: number, districtCode: number, communeCode: number }} param0
+ * @returns {Promise<{
+ *   province: InstanceType<Province>,
+ *   district: InstanceType<District>,
+ *   commune: InstanceType<Commune>
+ * }>}
+ */
+const validateLocation = async ({ provinceCode, districtCode, communeCode }) => {
+  const [province, district, commune] = await Promise.all([
+    Province.findOne({ code: provinceCode }),
+    District.findOne({ code: districtCode }),
+    Commune.findOne({ code: communeCode }),
   ])
 
   if (!province) {
@@ -57,28 +102,20 @@ const createInvoice = async (body) => {
     throw new HttpError(StatusCodes.BAD_REQUEST, 'Commune not found')
   }
 
-  body.products = products
-
-  const invoice = new Invoice(body)
-
-  invoice.province = province.name
-  invoice.district = district.name
-  invoice.commune = commune.name
-  let totalPrice = 0
-  products.forEach((p) => {
-    totalPrice += p.price
-  })
-  invoice.totalPrice = totalPrice
-  if (body.paymentMethod === PAYMENT_METHODS.COD) {
-    invoice.status = INVOICE_STATUSES.WAITING_FOR_DELIVERY
+  if (district.provinceCode !== provinceCode) {
+    throw new HttpError(
+      StatusCodes.BAD_REQUEST,
+      `'${district.name}' is not in '${province.name}'`,
+    )
   }
-  if (body.paymentMethod === PAYMENT_METHODS.MOMO) {
-    invoice.status = INVOICE_STATUSES.WAITING_FOR_PAYMENT
+  if (commune.districtCode !== districtCode) {
+    throw new HttpError(
+      StatusCodes.BAD_REQUEST,
+      `'${commune.name}' is not in '${district.name}'`,
+    )
   }
 
-  await invoice.save()
-
-  return invoice
+  return { province, district, commune }
 }
 
 /**
@@ -86,48 +123,46 @@ const createInvoice = async (body) => {
  * - Decrease the quantity of each product
  * - If success return picked up products. If fail, send back products
  * @param {{ productId: string, quantity: number }[]} pickUpItems
- * @returns {Promise<{_id, name, price, discount, quantity}[]>}
+ * @returns {Promise<{product, name, price, discount, quantity}[]>}
  */
 const pickUpProducts = async (pickUpItems) => {
   const products = await Promise.all(
-    pickUpItems.map(
-      (async ({ productId, quantity }) => {
-        const product = await Product.findOneAndUpdate(
-          { _id: productId, quantity: { $gte: quantity } },
-          { $inc: { quantity: -quantity } },
-          { new: true },
-        )
-        if (product) {
-          const { _id, name, price, discount } = product
-          return { _id, name, price, discount, quantity }
-        }
-        return null
-      })(),
-    ),
+    pickUpItems.map(({ productId, quantity }) => {
+      return Product.findOneAndUpdate(
+        { _id: productId, quantity: { $gte: quantity } },
+        { $inc: { quantity: -quantity } },
+        { new: true },
+      )
+    }),
   )
 
   if (products.includes(null)) {
-    // if a product is null, it is out of stock => send back the picked up products
+    // if a product is null, it does not have enough quantity
+    // => send back the picked up products
     const sendBackItems = []
-    const outOfStockProductIds = []
+    const insufficientQuantityProductIds = []
     products.forEach((product, i) => {
       if (!product) {
-        outOfStockProductIds.push(pickUpItems[i].productId)
+        insufficientQuantityProductIds.push(pickUpItems[i].productId)
       } else {
-        sendBackItems.push({
-          productId: pickUpItems[i].productId,
-          quantity: pickUpItems[i].quantity,
-        })
+        const { productId, quantity } = pickUpItems[i]
+        sendBackItems.push({ productId, quantity })
       }
     })
     await sendBackProducts(sendBackItems)
-    throw new HttpError(StatusCodes.BAD_REQUEST, 'Product out of stock', {
-      type: 'product-out-of-stock',
-      details: { outOfStockProductIds },
+    throw new HttpError(StatusCodes.BAD_REQUEST, 'Insufficient product quantity', {
+      type: 'insufficient-product-quantity',
+      details: { insufficientQuantityProductIds },
     })
   }
 
-  return products
+  return products.map((product, i) => {
+    if (product) {
+      const { name, price, discount } = product
+      const { productId, quantity } = pickUpItems[i]
+      return { product: productId, name, price, discount, quantity }
+    }
+  })
 }
 
 /**
