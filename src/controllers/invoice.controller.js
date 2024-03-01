@@ -15,4 +15,10 @@ const createInvoice = async (req, res) => {
   })
 }
 
-module.exports = { createInvoice }
+/** @type {controller} */
+const getInvoices = async (req, res) => {
+  const result = await invoiceService.getInvoices(req.query)
+  return res.json(result)
+}
+
+module.exports = { createInvoice, getInvoices }

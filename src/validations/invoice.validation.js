@@ -1,6 +1,6 @@
 const Joi = require('joi')
 
-const { stringId } = require('./custom.validation')
+const { stringId, page, limit } = require('./custom.validation')
 const { PAYMENT_METHODS } = require('../common/constants')
 
 module.exports = {
@@ -32,6 +32,15 @@ module.exports = {
       paymentMethod: Joi.string()
         .valid(...Object.values(PAYMENT_METHODS))
         .required(),
+    },
+  },
+
+  getInvoices: {
+    query: {
+      page: page,
+      limit: limit,
+      checkPaginate: Joi.boolean(),
+      includeProduct: Joi.boolean(),
     },
   },
 }
