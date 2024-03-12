@@ -43,4 +43,16 @@ module.exports = {
       includeProduct: Joi.boolean(),
     },
   },
+
+  cancelInvoice: {
+    params: {
+      invoiceId: stringId.required(),
+    },
+  },
+
+  confirmInvoice: {
+    params: {
+      invoiceId: stringId.required(),
+    },
+  },
 }

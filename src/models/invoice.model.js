@@ -59,14 +59,7 @@ const invoiceSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: Object.values(INVOICE_STATUSES),
-      validate: function (status) {
-        const invoice = this
-        if (invoice.paymentMethod === PAYMENT_METHODS.COD) {
-          if (status === INVOICE_STATUSES.WAITING_FOR_PAYMENT) {
-            throw new Error(`Invalid invoice status (${status}) in COD invoice`)
-          }
-        }
-      },
+      default: INVOICE_STATUSES.WAITING_FOR_CONFIRMATION,
       required: true,
     },
   },

@@ -21,4 +21,22 @@ const getInvoices = async (req, res) => {
   return res.json(result)
 }
 
-module.exports = { createInvoice, getInvoices }
+/** @type {controller} */
+const cancelInvoice = async (req, res) => {
+  const { invoiceId } = req.params
+  await invoiceService.cancelInvoice(invoiceId)
+  return res.status(StatusCodes.OK).json({
+    message: 'Cancel invoice successfully',
+  })
+}
+
+/** @type {controller} */
+const confirmInvoice = async (req, res) => {
+  const { invoiceId } = req.params
+  await invoiceService.confirmInvoice(invoiceId)
+  return res.status(StatusCodes.OK).json({
+    message: 'Confirm invoice successfully',
+  })
+}
+
+module.exports = { createInvoice, getInvoices, cancelInvoice, confirmInvoice }

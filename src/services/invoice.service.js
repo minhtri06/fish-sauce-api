@@ -10,6 +10,66 @@ const { HttpError } = require('../helpers')
 const { PAYMENT_METHODS, INVOICE_STATUSES } = require('../common/constants')
 
 /**
+ * Pick up products
+ * - Decrease the quantity of each product
+ * - If success return picked up products. If fail, send back products
+ * @param {{ productId: string, quantity: number }[]} pickUpItems
+ * @returns {Promise<{product, name, price, discount, quantity}[]>}
+ */
+const pickUpProducts = async (pickUpItems) => {
+  const products = await Promise.all(
+    pickUpItems.map(({ productId, quantity }) => {
+      return Product.findOneAndUpdate(
+        { _id: productId, quantity: { $gte: quantity } },
+        { $inc: { quantity: -quantity } },
+        { new: true },
+      )
+    }),
+  )
+
+  if (products.includes(null)) {
+    // if a product is null, it does not have enough quantity
+    // => send back the picked up products
+    const sendBackItems = []
+    const insufficientQuantityProductIds = []
+    products.forEach((product, i) => {
+      if (!product) {
+        insufficientQuantityProductIds.push(pickUpItems[i].productId)
+      } else {
+        const { productId, quantity } = pickUpItems[i]
+        sendBackItems.push({ productId, quantity })
+      }
+    })
+    await sendBackProducts(sendBackItems)
+    throw new HttpError(StatusCodes.BAD_REQUEST, 'Insufficient product quantity', {
+      type: 'insufficient-product-quantity',
+      details: { insufficientQuantityProductIds },
+    })
+  }
+
+  return products.map((product, i) => {
+    if (product) {
+      const { name, price, discount } = product
+      const { productId, quantity } = pickUpItems[i]
+      return { product: productId, name, price, discount, quantity }
+    }
+  })
+}
+
+/**
+ * Send back products
+ *  - Increase the quantity of each product
+ * @param {{ productId: string, quantity: number }[]} sendBackItems
+ */
+const sendBackProducts = async (sendBackItems) => {
+  await Promise.all(
+    sendBackItems.map(({ productId, quantity }) =>
+      Product.updateOne({ _id: productId }, { $inc: { quantity } }),
+    ),
+  )
+}
+
+/**
  * Create an invoice
  * @param {{
  *   products: { productId: string, quantity: number }[],
@@ -69,65 +129,6 @@ const createInvoice = async (body) => {
     return { province, district, commune }
   }
 
-  /**
-   * Pick up products
-   * - Decrease the quantity of each product
-   * - If success return picked up products. If fail, send back products
-   * @param {{ productId: string, quantity: number }[]} pickUpItems
-   * @returns {Promise<{product, name, price, discount, quantity}[]>}
-   */
-  const pickUpProducts = async (pickUpItems) => {
-    const products = await Promise.all(
-      pickUpItems.map(({ productId, quantity }) => {
-        return Product.findOneAndUpdate(
-          { _id: productId, quantity: { $gte: quantity } },
-          { $inc: { quantity: -quantity } },
-          { new: true },
-        )
-      }),
-    )
-
-    if (products.includes(null)) {
-      // if a product is null, it does not have enough quantity
-      // => send back the picked up products
-      const sendBackItems = []
-      const insufficientQuantityProductIds = []
-      products.forEach((product, i) => {
-        if (!product) {
-          insufficientQuantityProductIds.push(pickUpItems[i].productId)
-        } else {
-          const { productId, quantity } = pickUpItems[i]
-          sendBackItems.push({ productId, quantity })
-        }
-      })
-      await sendBackProducts(sendBackItems)
-      throw new HttpError(StatusCodes.BAD_REQUEST, 'Insufficient product quantity', {
-        type: 'insufficient-product-quantity',
-        details: { insufficientQuantityProductIds },
-      })
-    }
-
-    return products.map((product, i) => {
-      if (product) {
-        const { name, price, discount } = product
-        const { productId, quantity } = pickUpItems[i]
-        return { product: productId, name, price, discount, quantity }
-      }
-    })
-  }
-
-  /**
-   * Send back products
-   * @param {{ productId: string, quantity: number }[]} sendBackItems
-   */
-  const sendBackProducts = async (sendBackItems) => {
-    await Promise.all(
-      sendBackItems.map(({ productId, quantity }) =>
-        Product.updateOne({ _id: productId }, { $inc: { quantity } }),
-      ),
-    )
-  }
-
   // main logic
 
   body = pick(
@@ -161,12 +162,7 @@ const createInvoice = async (body) => {
   })
   invoice.totalPrice = totalPrice
 
-  if (body.paymentMethod === PAYMENT_METHODS.COD) {
-    invoice.status = INVOICE_STATUSES.WAITING_FOR_DELIVERY
-  }
-  if (body.paymentMethod === PAYMENT_METHODS.MOMO) {
-    invoice.status = INVOICE_STATUSES.WAITING_FOR_PAYMENT
-  }
+  invoice.status = INVOICE_STATUSES.WAITING_FOR_CONFIRMATION
 
   try {
     await invoice.save()
@@ -194,7 +190,68 @@ const getInvoices = async ({ includeProduct, checkPaginate, page, limit }) => {
   return result
 }
 
+/**
+ * Cancel an invoice
+ * @param {string} invoiceId
+ * @returns {Promise<InstanceType<Invoice>>}
+ */
+const cancelInvoice = async (invoiceId) => {
+  const invoice = await Invoice.findById(invoiceId)
+  if (!invoice) {
+    throw new HttpError(StatusCodes.NOT_FOUND, 'Invoice not found')
+  }
+
+  if (
+    invoice.status === INVOICE_STATUSES.WAITING_FOR_CONFIRMATION ||
+    invoice.status === INVOICE_STATUSES.CONFIRMED
+  ) {
+    // send back products
+    const invoiceItems = invoice.products.map((p) => {
+      return {
+        productId: p.product,
+        quantity: p.quantity,
+      }
+    })
+    await sendBackProducts(invoiceItems)
+  }
+
+  invoice.status = INVOICE_STATUSES.CANCELED
+  await invoice.save()
+
+  return invoice
+}
+
+/**
+ * Confirm an invoice
+ * @param {string} invoiceId
+ * @returns {Promise<InstanceType<Invoice>>}
+ */
+const confirmInvoice = async (invoiceId) => {
+  const invoice = await Invoice.findById(invoiceId)
+  if (!invoice) {
+    throw new HttpError(StatusCodes.NOT_FOUND, 'Invoice not found')
+  }
+
+  if (invoice.status === INVOICE_STATUSES.CANCELED) {
+    // if the invoice has canceled, pick up products again
+    const invoiceItems = invoice.products.map((p) => {
+      return {
+        productId: p.product,
+        quantity: p.quantity,
+      }
+    })
+    await pickUpProducts(invoiceItems)
+  }
+
+  invoice.status = INVOICE_STATUSES.CONFIRMED
+  await invoice.save()
+
+  return invoice
+}
+
 module.exports = {
   createInvoice,
   getInvoices,
+  cancelInvoice,
+  confirmInvoice,
 }

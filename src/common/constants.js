@@ -2,13 +2,13 @@ module.exports = Object.freeze({
   PAYMENT_METHODS: {
     COD: 'cod',
     MOMO: 'momo',
+    BANK_TRANSFER: 'bank-transfer',
   },
 
   INVOICE_STATUSES: {
-    WAITING_FOR_PAYMENT: 'waiting-for-payment',
-    WAITING_FOR_DELIVERY: 'waiting-for-delivery',
-    DELIVERED: 'delivered',
-    CANCEL: 'cancel',
+    WAITING_FOR_CONFIRMATION: 'waiting-for-confirmation',
+    CONFIRMED: 'confirmed',
+    CANCELED: 'canceled',
   },
 
   MODEL_NAMES: {
