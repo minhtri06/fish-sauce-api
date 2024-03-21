@@ -7,7 +7,9 @@
   "license": "ISC",
   "scripts": {
     "dev": "nodemon ./src/index.js",
-    "init-data": "node ./src/helpers/initData.helper.js"
+    "init-data": "node ./src/helpers/initData.helper.js",
+    "start": "node ./src/index.js",
+    "pm2": "pm2 startOrRestart ecosystem.config.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
