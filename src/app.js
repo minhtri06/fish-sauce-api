@@ -8,6 +8,7 @@ const logger = require('morgan')
 const ENV_CONFIG = require('./configs/env.config')
 const { notfound, handleError } = require('./middlewares')
 const router = require('./routes')
+const { PUBLIC_FULL_PATH } = require('./common/constants')
 
 const app = express()
 
@@ -26,6 +27,8 @@ app.use(logger('dev'))
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+
+app.use(express.static(PUBLIC_FULL_PATH))
 
 app.use('/api/v1', router)
 

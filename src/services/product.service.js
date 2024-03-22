@@ -1,11 +1,12 @@
+const { StatusCodes } = require('http-status-codes')
+
 const { PRODUCT_STATUSES } = require('../common/constants')
 const { validateSortString, HttpError } = require('../helpers')
 const Product = require('../models/product.model')
 const Category = require('../models/category.model')
 const Tag = require('../models/tag.model')
 const { pick } = require('../utils')
-const { StatusCodes } = require('http-status-codes')
-const { cloudinary } = require('../configs/cloudinary.config')
+const imageStorageService = require('./image-storage.service')
 
 /**
  * Create product
@@ -156,9 +157,9 @@ const updateProduct = async (productId, body, newImages) => {
     throw new HttpError(StatusCodes.NOT_FOUND, 'Product not found')
   }
 
+  let removedImages = undefined
   if (body.images) {
-    const removedImages = product.images.filter((image) => !body.images.includes(image))
-    cloudinary.api.delete_resources(removedImages)
+    removedImages = product.images.filter((image) => !body.images.includes(image))
     product.images.pull(...removedImages)
   }
   if (newImages) {
@@ -171,6 +172,12 @@ const updateProduct = async (productId, body, newImages) => {
   )
 
   await product.save()
+
+  if (removedImages) {
+    removedImages.forEach((image) => {
+      imageStorageService.deleteImage(image)
+    })
+  }
 
   return product
 }
@@ -223,9 +230,15 @@ const removeImages = async (productId, removedImages) => {
   if (!product) {
     throw new HttpError(StatusCodes.NOT_FOUND, 'Product not found')
   }
-  cloudinary.api.delete_resources(removedImages)
+
   product.images.pull(...removedImages)
+
   await product.save()
+
+  removedImages.forEach((image) => {
+    imageStorageService.deleteImage(image)
+  })
+
   return product
 }
 

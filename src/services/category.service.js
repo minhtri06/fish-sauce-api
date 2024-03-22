@@ -1,10 +1,10 @@
 const { StatusCodes } = require('http-status-codes')
 
-const { cloudinary } = require('../configs/cloudinary.config')
 const { HttpError } = require('../helpers')
 const Category = require('../models/category.model')
 const Product = require('../models/product.model')
 const { pick } = require('../utils')
+const imageStorageService = require('./image-storage.service')
 
 /**
  * Create a category
@@ -33,19 +33,18 @@ const getAllCategories = async () => {
  */
 const updateCategoryById = async (categoryId, body) => {
   body = pick(body, 'name', 'image')
-  console.log(body)
   const category = await Category.findById(categoryId)
   if (!category) {
     throw new HttpError(StatusCodes.NOT_FOUND, 'Category not found')
   }
-  let oldImage
+  let oldImage = undefined
   if (body.image) {
     oldImage = category.image
   }
   Object.assign(category, body)
   await category.save()
   if (oldImage) {
-    cloudinary.uploader.destroy(oldImage)
+    imageStorageService.deleteImage(oldImage)
   }
   return category
 }
@@ -70,7 +69,7 @@ const deleteCategoryById = async (categoryId) => {
     )
   }
   await category.deleteOne()
-  cloudinary.uploader.destroy(category.image)
+  imageStorageService.deleteImage(category.image)
 }
 
 module.exports = {

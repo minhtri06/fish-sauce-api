@@ -2,5 +2,6 @@
 /.vscode
 /test.js
 /dump.rdb
-# /.env
+/.env
 /others
+/public/images/*
