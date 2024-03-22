@@ -20,6 +20,10 @@ const envSchema = Joi.object({
   CLOUDINARY_API_KEY: Joi.string().required(),
   CLOUDINARY_API_SECRET: Joi.string().required(),
   CLOUDINARY_FOLDER: Joi.string().required(),
+
+  USER_EMAIL: Joi.string().required(),
+  USER_PASSWORD: Joi.string().required(),
+  USER_NAME: Joi.string().required()
 }).unknown()
 
 const { value: envVars, error } = envSchema.validate(process.env)
@@ -51,6 +55,12 @@ const ENV_CONFIG = Object.freeze({
     API_SECRET: envVars.CLOUDINARY_API_SECRET,
     FOLDER: envVars.CLOUDINARY_FOLDER,
   },
+
+  USER: {
+    EMAIL: envVars.USER_EMAIL,
+    PASSWORD: envVars.USER_PASSWORD,
+    NAME: envVars.USER_NAME
+  }
 })
 
 module.exports = ENV_CONFIG
