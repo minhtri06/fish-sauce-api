@@ -1,3 +1,7 @@
+const APP_FULL_PATH = process.cwd()
+const PUBLIC_FULL_PATH = APP_FULL_PATH + '/public'
+const IMAGES_FULL_PATH = PUBLIC_FULL_PATH + '/images'
+
 module.exports = Object.freeze({
   PAYMENT_METHODS: {
     COD: 'cod',
@@ -32,4 +36,8 @@ module.exports = Object.freeze({
     REFRESH_TOKEN: 'refresh-token',
     ACCESS_TOKEN: 'access-token',
   },
+
+  APP_FULL_PATH,
+  PUBLIC_FULL_PATH,
+  IMAGES_FULL_PATH,
 })

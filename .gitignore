@@ -4,3 +4,4 @@
 /dump.rdb
 /.env
 /others
+/public/images/*
