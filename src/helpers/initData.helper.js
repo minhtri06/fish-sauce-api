@@ -6,16 +6,15 @@ const District = require('../models/district.model')
 const Commune = require('../models/commune.model')
 const location = require('../../data/location.json')
 const { connectMongoDb } = require('../db')
+const ENV_CONFIG = require('../configs/env.config')
 
 const initUser = async () => {
-  const user = await User.findOne({ email: 'admin@email.com' })
-  if (!user) {
-    await User.create({
-      email: 'admin@email.com',
-      password: 'Abc@12345',
-      name: 'Nguyen Van A',
-    })
-  }
+  await User.deleteMany()
+  await User.create({
+    email: ENV_CONFIG.USER.EMAIL,
+    password: ENV_CONFIG.USER.PASSWORD,
+    name: ENV_CONFIG.USER.NAME,
+  })
 }
 
 const initLocation = async () => {
