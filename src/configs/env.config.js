@@ -23,7 +23,10 @@ const envSchema = Joi.object({
 
   USER_EMAIL: Joi.string().required(),
   USER_PASSWORD: Joi.string().required(),
-  USER_NAME: Joi.string().required()
+  USER_NAME: Joi.string().required(),
+
+  RATE_LIMIT_WINDOW_MINUTE: Joi.number().integer().min(1).required(),
+  RATE_LIMIT_PER_WINDOW: Joi.number().integer().min(1).required(),
 }).unknown()
 
 const { value: envVars, error } = envSchema.validate(process.env)
@@ -59,8 +62,11 @@ const ENV_CONFIG = Object.freeze({
   USER: {
     EMAIL: envVars.USER_EMAIL,
     PASSWORD: envVars.USER_PASSWORD,
-    NAME: envVars.USER_NAME
-  }
+    NAME: envVars.USER_NAME,
+  },
+
+  RATE_LIMIT_WINDOW_MINUTE: envVars.RATE_LIMIT_WINDOW_MINUTE,
+  RATE_LIMIT_PER_WINDOW: envVars.RATE_LIMIT_PER_WINDOW,
 })
 
 module.exports = ENV_CONFIG
