@@ -16,11 +16,6 @@ const envSchema = Joi.object({
   JWT_ACCESS_EXPIRATION_MINUTES: Joi.number().integer().min(1).required(),
   JWT_REFRESH_EXPIRATION_DAYS: Joi.number().integer().min(1).required(),
 
-  CLOUDINARY_NAME: Joi.string().required(),
-  CLOUDINARY_API_KEY: Joi.string().required(),
-  CLOUDINARY_API_SECRET: Joi.string().required(),
-  CLOUDINARY_FOLDER: Joi.string().required(),
-
   USER_EMAIL: Joi.string().required(),
   USER_PASSWORD: Joi.string().required(),
   USER_NAME: Joi.string().required(),
@@ -50,13 +45,6 @@ const ENV_CONFIG = Object.freeze({
     SECRET: envVars.JWT_SECRET,
     ACCESS_EXPIRATION_MINUTES: envVars.JWT_ACCESS_EXPIRATION_MINUTES,
     REFRESH_EXPIRATION_DAYS: envVars.JWT_REFRESH_EXPIRATION_DAYS,
-  },
-
-  CLOUDINARY: {
-    NAME: envVars.CLOUDINARY_NAME,
-    API_KEY: envVars.CLOUDINARY_API_KEY,
-    API_SECRET: envVars.CLOUDINARY_API_SECRET,
-    FOLDER: envVars.CLOUDINARY_FOLDER,
   },
 
   USER: {
