@@ -14,7 +14,7 @@ const logger = winston.createLogger({
   level: isProduction ? 'info' : 'debug', // only log when level >= 'info'/'debug'
   format: winston.format.combine(
     enumerateErrorFormat(),
-    isProduction ? winston.format.colorize() : winston.format.uncolorize(),
+    isProduction ? winston.format.uncolorize() : winston.format.colorize(),
     winston.format.timestamp(),
     winston.format.printf(({ level, message, timestamp }) => {
       return `${timestamp} [${level}]: ${message}`
