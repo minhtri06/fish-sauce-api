@@ -5,3 +5,5 @@
 /.env
 /others
 /public/images/*
+/logs/combine/*
+/logs/error/*

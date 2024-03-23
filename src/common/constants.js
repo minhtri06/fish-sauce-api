@@ -1,6 +1,7 @@
 const APP_FULL_PATH = process.cwd()
 const PUBLIC_FULL_PATH = APP_FULL_PATH + '/public'
 const IMAGES_FULL_PATH = PUBLIC_FULL_PATH + '/images'
+const LOG_FULL_PATH = APP_FULL_PATH + '/logs'
 
 module.exports = Object.freeze({
   PAYMENT_METHODS: {
@@ -40,4 +41,5 @@ module.exports = Object.freeze({
   APP_FULL_PATH,
   PUBLIC_FULL_PATH,
   IMAGES_FULL_PATH,
+  LOG_FULL_PATH,
 })
