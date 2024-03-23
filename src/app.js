@@ -13,6 +13,11 @@ const { PUBLIC_FULL_PATH } = require('./common/constants')
 
 const app = express()
 
+// enable trust proxy
+// because we use nginx as a proxy, we must enable trust proxy
+// otherwise the request's ip will always be 127.0.0.1
+app.set('trust proxy', 1)
+
 if (ENV_CONFIG.NODE_ENV !== 'test') {
   app.use(morganSuccessHandler)
   app.use(morganErrorHandler)
