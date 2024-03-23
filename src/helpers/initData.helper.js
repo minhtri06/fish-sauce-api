@@ -7,6 +7,7 @@ const Commune = require('../models/commune.model')
 const location = require('../../data/location.json')
 const { connectMongoDb } = require('../db')
 const ENV_CONFIG = require('../configs/env.config')
+const logger = require('../configs/logger.config')
 
 const initUser = async () => {
   await User.deleteMany()
@@ -50,17 +51,18 @@ const initLocation = async () => {
 
 const initData = async () => {
   await connectMongoDb()
-  console.log('🍂 Init data start')
+
+  logger.info('🍂 Init data start')
 
   await initUser()
-  console.log('🍃 Init user successfully')
+  logger.info('🍃 Init user successfully')
   await initLocation()
-  console.log('🍃 Init location successfully')
+  logger.info('🍃 Init location successfully')
 
-  console.log('🍂 Init data done')
+  logger.info('🍂 Init data done')
   await mongoose.connection.close()
 }
 
 initData().catch((error) => {
-  console.log(error)
+  logger.error(error)
 })

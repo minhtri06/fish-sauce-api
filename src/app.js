@@ -3,15 +3,20 @@ require('express-async-errors')
 const express = require('express')
 const cors = require('cors')
 const helmet = require('helmet')
-const logger = require('morgan')
 const rateLimit = require('express-rate-limit')
 
 const ENV_CONFIG = require('./configs/env.config')
+const { morganSuccessHandler, morganErrorHandler } = require('./configs/morgan.config')
 const { notfound, handleError } = require('./middlewares')
 const router = require('./routes')
 const { PUBLIC_FULL_PATH } = require('./common/constants')
 
 const app = express()
+
+if (ENV_CONFIG.NODE_ENV !== 'test') {
+  app.use(morganSuccessHandler)
+  app.use(morganErrorHandler)
+}
 
 app.use(helmet())
 
@@ -21,8 +26,6 @@ app.use(
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   }),
 )
-
-app.use(logger('dev'))
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))

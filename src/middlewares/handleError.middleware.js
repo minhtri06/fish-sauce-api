@@ -2,7 +2,6 @@ const { StatusCodes } = require('http-status-codes')
 
 const { HttpError } = require('../helpers')
 const ENV_CONFIG = require('../configs/env.config')
-const imageStorageService = require('../services/image-storage.service')
 
 /** @type {import('express').ErrorRequestHandler} */
 const handleError = async (err, req, res, next) => {
@@ -24,6 +23,8 @@ const handleError = async (err, req, res, next) => {
   }
 
   if (err instanceof HttpError) {
+    res.locals.error = err
+
     const { message, statusCode, type, details, duplicateKeys } = err
 
     if (isOnProduction) {
@@ -37,7 +38,6 @@ const handleError = async (err, req, res, next) => {
 
       return res.status(statusCode).json({ message, type, details, duplicateKeys })
     } else {
-      console.log(err)
       return res.status(statusCode).json({ message, type, details, duplicateKeys })
     }
   }
@@ -47,7 +47,6 @@ const handleError = async (err, req, res, next) => {
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ message: 'Something went wrong' })
   } else {
-    console.log(err)
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: err.message })
   }
 }
