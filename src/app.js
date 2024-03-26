@@ -23,14 +23,14 @@ if (ENV_CONFIG.NODE_ENV !== 'test') {
   app.use(morganErrorHandler)
 }
 
-app.use(helmet())
-
 app.use(
   cors({
-    origin: [ENV_CONFIG.CLIENT_URL, 'https://fish-sauce-next.vercel.app'],
+    origin: ['https://nuocmamcogiang.com', 'http://localhost:3021'],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   }),
 )
+
+app.use(helmet())
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
